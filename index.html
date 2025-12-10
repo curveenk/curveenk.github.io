@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Timer - Time Between Clicks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .test-button {
+            background: #ffffff;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 40px 60px;
+            font-size: 1.5em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
+            min-width: 200px;
+        }
+
+        .test-button:hover {
+            background: #f0f0f0;
+        }
+
+        .test-button:active {
+            background: #e0e0e0;
+        }
+
+        .test-button.clicked {
+            background: #000;
+            color: #fff;
+        }
+
+        .hover-area {
+            background: #ffffff;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 60px 40px;
+            font-size: 1.3em;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
+            text-align: center;
+        }
+
+        .hover-area:hover {
+            background: #f0f0f0;
+        }
+
+        .hover-area.active {
+            background: #666;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .hover-area.completed {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .time-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .instruction {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #fff;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .reset-btn:active {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .test-button {
+                min-width: 100%;
+                padding: 30px 40px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Click Performance Tester</h1>
+        <p class="subtitle">Measure your click and mouse movement speed</p>
+
+        <!-- Button Click Test -->
+        <div class="section">
+            <div class="section-title">🖱️ Button Click Test</div>
+            <p class="instruction">Click Button 1, then click Button 2 as fast as you can</p>
+            
+            <div class="button-container">
+                <button class="test-button" id="button1">Button 1</button>
+                <button class="test-button" id="button2">Button 2</button>
+            </div>
+
+            <div class="result">
+                <div class="time-display" id="clickTimeDisplay">—</div>
+                <div class="result-label">Time between button clicks</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Fastest</div>
+                    <div class="stat-value" id="clickFastest">—</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Average</div>
+                    <div class="stat-value" id="clickAverage">—</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Attempts</div>
+                    <div class="stat-value" id="clickAttempts">0</div>
+                </div>
+            </div>
+
+            <button class="reset-btn" id="resetClickBtn">Reset Click Stats</button>
+        </div>
+
+        <!-- Mouse Movement Test -->
+        <div class="section">
+            <div class="section-title">🎯 Mouse Movement Test</div>
+            <p class="instruction">Move your mouse from Area 1 to Area 2 as fast as you can</p>
+            
+            <div class="button-container">
+                <div class="hover-area" id="area1">Area 1<br><small>Start here</small></div>
+                <div class="hover-area" id="area2">Area 2<br><small>Move here</small></div>
+            </div>
+
+            <div class="result">
+                <div class="time-display" id="hoverTimeDisplay">—</div>
+                <div class="result-label">Time to move between areas</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Fastest</div>
+                    <div class="stat-value" id="hoverFastest">—</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Average</div>
+                    <div class="stat-value" id="hoverAverage">—</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Attempts</div>
+                    <div class="stat-value" id="hoverAttempts">0</div>
+                </div>
+            </div>
+
+            <button class="reset-btn" id="resetHoverBtn">Reset Movement Stats</button>
+        </div>
+    </div>
+
+    <script>
+        // Button Click Test
+        let button1ClickTime = null;
+        let clickTimes = [];
+
+        const button1 = document.getElementById('button1');
+        const button2 = document.getElementById('button2');
+        const clickTimeDisplay = document.getElementById('clickTimeDisplay');
+        const clickFastest = document.getElementById('clickFastest');
+        const clickAverage = document.getElementById('clickAverage');
+        const clickAttempts = document.getElementById('clickAttempts');
+        const resetClickBtn = document.getElementById('resetClickBtn');
+
+        // Mouse Movement Test
+        let area1EnterTime = null;
+        let hoverTimes = [];
+        let isTestActive = false;
+
+        const area1 = document.getElementById('area1');
+        const area2 = document.getElementById('area2');
+        const hoverTimeDisplay = document.getElementById('hoverTimeDisplay');
+        const hoverFastest = document.getElementById('hoverFastest');
+        const hoverAverage = document.getElementById('hoverAverage');
+        const hoverAttempts = document.getElementById('hoverAttempts');
+        const resetHoverBtn = document.getElementById('resetHoverBtn');
+
+        function formatTime(ms) {
+            if (ms >= 1000) {
+                return (ms / 1000).toFixed(3) + 's';
+            }
+            return ms.toFixed(0) + 'ms';
+        }
+
+        function updateClickStats() {
+            if (clickTimes.length === 0) {
+                clickFastest.textContent = '—';
+                clickAverage.textContent = '—';
+                clickAttempts.textContent = '0';
+                return;
+            }
+
+            const fastest = Math.min(...clickTimes);
+            const average = clickTimes.reduce((a, b) => a + b, 0) / clickTimes.length;
+
+            clickFastest.textContent = formatTime(fastest);
+            clickAverage.textContent = formatTime(average);
+            clickAttempts.textContent = clickTimes.length;
+        }
+
+        function updateHoverStats() {
+            if (hoverTimes.length === 0) {
+                hoverFastest.textContent = '—';
+                hoverAverage.textContent = '—';
+                hoverAttempts.textContent = '0';
+                return;
+            }
+
+            const fastest = Math.min(...hoverTimes);
+            const average = hoverTimes.reduce((a, b) => a + b, 0) / hoverTimes.length;
+
+            hoverFastest.textContent = formatTime(fastest);
+            hoverAverage.textContent = formatTime(average);
+            hoverAttempts.textContent = hoverTimes.length;
+        }
+
+        // Button Click Test Logic
+        button1.addEventListener('click', () => {
+            button1ClickTime = Date.now();
+            button1.classList.add('clicked');
+            button2.classList.remove('clicked');
+            clickTimeDisplay.textContent = '⏳ Waiting...';
+        });
+
+        button2.addEventListener('click', () => {
+            if (button1ClickTime !== null) {
+                const timeDiff = Date.now() - button1ClickTime;
+                clickTimes.push(timeDiff);
+                
+                clickTimeDisplay.textContent = formatTime(timeDiff);
+                button2.classList.add('clicked');
+                
+                updateClickStats();
+                
+                // Reset after a short delay
+                setTimeout(() => {
+                    button1.classList.remove('clicked');
+                    button2.classList.remove('clicked');
+                    button1ClickTime = null;
+                }, 800);
+            }
+        });
+
+        resetClickBtn.addEventListener('click', () => {
+            clickTimes = [];
+            button1ClickTime = null;
+            button1.classList.remove('clicked');
+            button2.classList.remove('clicked');
+            clickTimeDisplay.textContent = '—';
+            updateClickStats();
+        });
+
+        // Mouse Movement Test Logic
+        area1.addEventListener('mouseenter', () => {
+            area1EnterTime = Date.now();
+            isTestActive = true;
+            area1.classList.add('active');
+            area2.classList.remove('active', 'completed');
+            hoverTimeDisplay.textContent = '⏳ Move to Area 2...';
+        });
+
+        area1.addEventListener('mouseleave', () => {
+            if (isTestActive) {
+                area1.classList.remove('active');
+            }
+        });
+
+        area2.addEventListener('mouseenter', () => {
+            if (isTestActive && area1EnterTime !== null) {
+                const timeDiff = Date.now() - area1EnterTime;
+                hoverTimes.push(timeDiff);
+                
+                hoverTimeDisplay.textContent = formatTime(timeDiff);
+                area2.classList.add('completed');
+                area1.classList.remove('active');
+                
+                updateHoverStats();
+                
+                isTestActive = false;
+                area1EnterTime = null;
+                
+                // Reset visual feedback after a short delay
+                setTimeout(() => {
+                    area2.classList.remove('completed');
+                }, 800);
+            }
+        });
+
+        resetHoverBtn.addEventListener('click', () => {
+            hoverTimes = [];
+            area1EnterTime = null;
+            isTestActive = false;
+            area1.classList.remove('active');
+            area2.classList.remove('active', 'completed');
+            hoverTimeDisplay.textContent = '—';
+            updateHoverStats();
+        });
+    </script>
+</body>
+</html>
