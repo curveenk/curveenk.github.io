@@ -283,7 +283,6 @@
         <!-- Button Click Test -->
         <div class="section">
             <div class="section-title">🖱️ Button Click Test</div>
-            <p class="instruction">Click Button 1, then click Button 2 as fast as you can</p>
             
             <div class="section-content">
                 <div class="main-area">
@@ -327,7 +326,7 @@
                                 <th>Btn A</th>
                                 <th>Btn B</th>
                                 <th>Btn C</th>
-                                <th>Click 2</th>
+                                <th>Avg Hover</th>
                                 <th>Total</th>
                             </tr>
                         </thead>
@@ -376,13 +375,29 @@
             const last10 = details.slice(-10).reverse();
             
             last10.forEach((detail, index) => {
+                // Calculate average time between hover state changes
+                let avgHover = '—';
+                const hoverTimes = [];
+                if (detail.buttonATime !== null) hoverTimes.push(detail.buttonATime);
+                if (detail.buttonBTime !== null && detail.buttonATime !== null) {
+                    hoverTimes.push(detail.buttonBTime - detail.buttonATime);
+                }
+                if (detail.buttonCTime !== null && detail.buttonBTime !== null) {
+                    hoverTimes.push(detail.buttonCTime - detail.buttonBTime);
+                }
+                
+                if (hoverTimes.length > 0) {
+                    const sum = hoverTimes.reduce((a, b) => a + b, 0);
+                    avgHover = formatTime(sum / hoverTimes.length);
+                }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>#${details.length - index}</strong></td>
                     <td>${detail.buttonATime !== null ? formatTime(detail.buttonATime) : '—'}</td>
                     <td>${detail.buttonBTime !== null ? formatTime(detail.buttonBTime) : '—'}</td>
                     <td>${detail.buttonCTime !== null ? formatTime(detail.buttonCTime) : '—'}</td>
-                    <td>${formatTime(detail.button2ClickSpeed)}</td>
+                    <td>${avgHover}</td>
                     <td><strong>${formatTime(detail.totalTime)}</strong></td>
                 `;
                 tbody.appendChild(tr);
