@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Timer - Time Between Clicks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .section-content {
+            margin-top: 20px;
+        }
+
+        .main-area {
+            width: 100%;
+        }
+
+        .history-area {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .history-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .history-table th {
+            background: #000;
+            color: #fff;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #000;
+        }
+
+        .history-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            background: #fff;
+        }
+
+        .history-table tr:nth-child(even) td {
+            background: #f9f9f9;
+        }
+
+        .history-table tr:hover td {
+            background: #f0f0f0;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-button {
+            background: #ffffff;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 30px 40px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
+            width: 180px;
+        }
+
+        .test-button:hover {
+            background: #f0f0f0;
+        }
+
+        .test-button:active {
+            background: #e0e0e0;
+        }
+
+       /* .test-button.clicked {
+            background: #e0e0e0;
+            color: #000;
+        } */
+
+        .intermediate-button {
+            background: #ffffff;
+            color: #666;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            padding: 30px 20px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: default;
+            transition: background 0.1s ease, border-color 0.1s ease;
+            user-select: none;
+            width: 120px;
+        }
+
+        .intermediate-button.hovered {
+            background: #f0f0f0;
+            border-color: #666;
+        }
+
+
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .time-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .instruction {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #fff;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .reset-btn:active {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .test-button {
+                min-width: 100%;
+                padding: 30px 40px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .history-table {
+                font-size: 0.8em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Click Performance Tester</h1>
+        <p class="subtitle">Measure your click and mouse movement speed</p>
+
+        <!-- Button Click Test -->
+        <div class="section">
+            <div class="section-title">🖱️ Button Click Test</div>
+            <p class="instruction">Click Button 1, then click Button 2 as fast as you can</p>
+            
+            <div class="section-content">
+                <div class="main-area">
+                    <div class="button-container">
+                        <button class="test-button" id="button1">Button 1</button>
+                        <div class="intermediate-button" id="buttonA">A</div>
+                        <div class="intermediate-button" id="buttonB">B</div>
+                        <div class="intermediate-button" id="buttonC">C</div>
+                        <button class="test-button" id="button2">Button 2</button>
+                    </div>
+
+                    <div class="result">
+                        <div class="time-display" id="clickTimeDisplay">—</div>
+                        <div class="result-label">Time between button clicks</div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-label">Fastest</div>
+                            <div class="stat-value" id="clickFastest">—</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Average</div>
+                            <div class="stat-value" id="clickAverage">—</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Attempts</div>
+                            <div class="stat-value" id="clickAttempts">0</div>
+                        </div>
+                    </div>
+
+                    <button class="reset-btn" id="resetClickBtn">Reset Click Stats</button>
+                </div>
+
+                <div class="history-area">
+                    <div class="history-title">Last 10 Results</div>
+                    <table class="history-table" id="clickHistory">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Btn A</th>
+                                <th>Btn B</th>
+                                <th>Btn C</th>
+                                <th>Click 2</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clickHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        // Button Click Test with detailed tracking
+        let button1ClickTime = null;
+        let button1LeaveTime = null;
+        let button2EnterTime = null;
+        let buttonAHoverTime = null;
+        let buttonBHoverTime = null;
+        let buttonCHoverTime = null;
+        let clickTimes = [];
+        let clickDetails = [];
+
+        const button1 = document.getElementById('button1');
+        const button2 = document.getElementById('button2');
+        const buttonA = document.getElementById('buttonA');
+        const buttonB = document.getElementById('buttonB');
+        const buttonC = document.getElementById('buttonC');
+        const clickTimeDisplay = document.getElementById('clickTimeDisplay');
+        const clickFastest = document.getElementById('clickFastest');
+        const clickAverage = document.getElementById('clickAverage');
+        const clickAttempts = document.getElementById('clickAttempts');
+        const resetClickBtn = document.getElementById('resetClickBtn');
+
+        function formatTime(ms) {
+            if (ms >= 1000) {
+                return (ms / 1000).toFixed(3) + 's';
+            }
+            return ms.toFixed(0) + 'ms';
+        }
+
+        function updateHistory(details) {
+            const tbody = document.getElementById('clickHistoryBody');
+            tbody.innerHTML = '';
+            const last10 = details.slice(-10).reverse();
+            
+            last10.forEach((detail, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>#${details.length - index}</strong></td>
+                    <td>${detail.buttonATime !== null ? formatTime(detail.buttonATime) : '—'}</td>
+                    <td>${detail.buttonBTime !== null ? formatTime(detail.buttonBTime) : '—'}</td>
+                    <td>${detail.buttonCTime !== null ? formatTime(detail.buttonCTime) : '—'}</td>
+                    <td>${formatTime(detail.button2ClickSpeed)}</td>
+                    <td><strong>${formatTime(detail.totalTime)}</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateClickStats() {
+            if (clickTimes.length === 0) {
+                clickFastest.textContent = '—';
+                clickAverage.textContent = '—';
+                clickAttempts.textContent = '0';
+                document.getElementById('clickHistoryBody').innerHTML = '';
+                return;
+            }
+
+            const fastest = Math.min(...clickTimes);
+            const average = clickTimes.reduce((a, b) => a + b, 0) / clickTimes.length;
+
+            clickFastest.textContent = formatTime(fastest);
+            clickAverage.textContent = formatTime(average);
+            clickAttempts.textContent = clickTimes.length;
+            updateHistory(clickDetails);
+        }
+
+        // Track mouse leave for Button 1
+        button1.addEventListener('mouseleave', () => {
+            button1LeaveTime = Date.now();
+        });
+
+        // Track mouse enter for intermediate buttons
+        buttonA.addEventListener('mouseenter', () => {
+            if (button1ClickTime !== null && buttonAHoverTime === null) {
+                buttonAHoverTime = Date.now() - button1ClickTime;
+                buttonA.classList.add('hovered');
+            }
+        });
+
+        buttonB.addEventListener('mouseenter', () => {
+            if (button1ClickTime !== null && buttonBHoverTime === null) {
+                buttonBHoverTime = Date.now() - button1ClickTime;
+                buttonB.classList.add('hovered');
+            }
+        });
+
+        buttonC.addEventListener('mouseenter', () => {
+            if (button1ClickTime !== null && buttonCHoverTime === null) {
+                buttonCHoverTime = Date.now() - button1ClickTime;
+                buttonC.classList.add('hovered');
+            }
+        });
+
+        // Track mouse enter for Button 2
+        button2.addEventListener('mouseenter', () => {
+            button2EnterTime = Date.now();
+        });
+
+        // Button Click Test Logic
+        button1.addEventListener('click', () => {
+            button1ClickTime = Date.now();
+            button1LeaveTime = null; // Reset for new measurement
+            button2EnterTime = null; // Reset button2 enter time
+            buttonAHoverTime = null;
+            buttonBHoverTime = null;
+            buttonCHoverTime = null;
+            button1.classList.add('clicked');
+            button2.classList.remove('clicked');
+            buttonA.classList.remove('hovered');
+            buttonB.classList.remove('hovered');
+            buttonC.classList.remove('hovered');
+            clickTimeDisplay.textContent = '⏳ Waiting...';
+        });
+
+        button2.addEventListener('click', () => {
+            if (button1ClickTime !== null) {
+                const now = Date.now();
+                const b2Enter = button2EnterTime || now;
+                
+                // Calculate timings
+                const button2ClickSpeed = now - b2Enter; // Time from entering button2 to clicking
+                const totalTime = now - button1ClickTime; // Total time from button1 click to button2 click
+                
+                clickTimes.push(totalTime);
+                clickDetails.push({
+                    buttonATime: buttonAHoverTime,
+                    buttonBTime: buttonBHoverTime,
+                    buttonCTime: buttonCHoverTime,
+                    button2ClickSpeed: Math.max(0, button2ClickSpeed),
+                    totalTime: totalTime
+                });
+                
+                clickTimeDisplay.textContent = formatTime(totalTime);
+                button2.classList.add('clicked');
+                
+                updateClickStats();
+                
+                // Reset immediately, not in timeout
+                button1ClickTime = null;
+                button1LeaveTime = null;
+                button2EnterTime = null;
+                buttonAHoverTime = null;
+                buttonBHoverTime = null;
+                buttonCHoverTime = null;
+                
+                // Visual feedback reset after delay
+                setTimeout(() => {
+                    button1.classList.remove('clicked');
+                    button2.classList.remove('clicked');
+                    buttonA.classList.remove('hovered');
+                    buttonB.classList.remove('hovered');
+                    buttonC.classList.remove('hovered');
+                }, 800);
+            }
+        });
+
+        resetClickBtn.addEventListener('click', () => {
+            clickTimes = [];
+            clickDetails = [];
+            button1ClickTime = null;
+            button1LeaveTime = null;
+            button2EnterTime = null;
+            buttonAHoverTime = null;
+            buttonBHoverTime = null;
+            buttonCHoverTime = null;
+            button1.classList.remove('clicked');
+            button2.classList.remove('clicked');
+            buttonA.classList.remove('hovered');
+            buttonB.classList.remove('hovered');
+            buttonC.classList.remove('hovered');
+            clickTimeDisplay.textContent = '—';
+            updateClickStats();
+        });
+    </script>
+</body>
+</html>
